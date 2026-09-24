@@ -1,0 +1,560 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const StudentRegistrationApp());
+}
+
+class StudentRegistrationApp extends StatelessWidget {
+  const StudentRegistrationApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Student Registration Portal',
+      theme: ThemeData(
+        fontFamily: 'Arial',
+        scaffoldBackgroundColor: const Color(0xFFF4F7FF),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF5B4BDB),
+        ),
+      ),
+      home: const RegistrationPage(),
+    );
+  }
+}
+
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
+
+  @override
+  State<RegistrationPage> createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+
+  String? department;
+  String? gender;
+  bool acceptedTerms = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ---------------- HEADER ----------------
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(25, 55, 25, 35),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF5B4BDB),
+                    Color(0xFF7C4DFF),
+                    Color(0xFF9C6BFF),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(35),
+                  bottomRight: Radius.circular(35),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.20),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.school_rounded,
+                      color: Colors.white,
+                      size: 45,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'Student Registration',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  const Text(
+                    'Create your student account',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ---------------- FORM ----------------
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Personal Details',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF29244A),
+                      ),
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    const Text(
+                      'Enter your details carefully',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // NAME
+                    buildTextField(
+                      controller: nameController,
+                      label: 'Student Name',
+                      hint: 'Enter your full name',
+                      icon: Icons.person_rounded,
+                      color: const Color(0xFF5B4BDB),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // EMAIL
+                    buildTextField(
+                      controller: emailController,
+                      label: 'Email Address',
+                      hint: 'example@gmail.com',
+                      icon: Icons.email_rounded,
+                      color: const Color(0xFF00897B),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter your email';
+                        }
+
+                        if (!value.contains('@')) {
+                          return 'Enter a valid email';
+                        }
+
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // PHONE
+                    buildTextField(
+                      controller: phoneController,
+                      label: 'Phone Number',
+                      hint: 'Enter 10-digit number',
+                      icon: Icons.phone_rounded,
+                      color: const Color(0xFFFF7043),
+                      keyboardType: TextInputType.phone,
+                      maxLength: 10,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter phone number';
+                        }
+
+                        if (value.length != 10) {
+                          return 'Enter a valid 10-digit number';
+                        }
+
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    // ---------------- ACADEMIC DETAILS ----------------
+
+                    const Text(
+                      'Academic Details',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF29244A),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // DEPARTMENT
+                    DropdownButtonFormField<String>(
+                      value: department,
+                      decoration: InputDecoration(
+                        labelText: 'Department',
+                        hintText: 'Select your department',
+                        prefixIcon: const Icon(
+                          Icons.account_balance_rounded,
+                          color: Color(0xFF00897B),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE1E3F0),
+                          ),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'CSE',
+                          child: Text('Computer Science Engineering'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'ECE',
+                          child: Text('Electronics & Communication'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'EEE',
+                          child: Text('Electrical & Electronics'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'MECH',
+                          child: Text('Mechanical Engineering'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'CIVIL',
+                          child: Text('Civil Engineering'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          department = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select department';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    // GENDER
+                    const Text(
+                      'Gender',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF29244A),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Row(
+                      children: [
+                        genderOption(
+                          'Male',
+                          Icons.male_rounded,
+                          Colors.blue,
+                        ),
+                        const SizedBox(width: 10),
+                        genderOption(
+                          'Female',
+                          Icons.female_rounded,
+                          Colors.pink,
+                        ),
+                        const SizedBox(width: 10),
+                        genderOption(
+                          'Other',
+                          Icons.person_outline_rounded,
+                          Colors.deepPurple,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // ---------------- TERMS ----------------
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFE1E3F0),
+                        ),
+                      ),
+                      child: CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: const Color(0xFF5B4BDB),
+                        title: const Text(
+                          'I accept the Terms & Conditions',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'I confirm that the information provided is correct.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: acceptedTerms,
+                        onChanged: (value) {
+                          setState(() {
+                            acceptedTerms = value ?? false;
+                          });
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    // ---------------- REGISTER BUTTON ----------------
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: registerStudent,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5B4BDB),
+                          foregroundColor: Colors.white,
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_rounded),
+                            SizedBox(width: 10),
+                            Text(
+                              'Create Account',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    const Center(
+                      child: Text(
+                        '© 2026 Student Registration Portal',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------- TEXT FIELD ----------------
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required Color color,
+    TextInputType keyboardType = TextInputType.text,
+    int? maxLength,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        counterText: '',
+        prefixIcon: Icon(
+          icon,
+          color: color,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: Color(0xFFE1E3F0),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: color,
+            width: 2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------- GENDER OPTION ----------------
+
+  Widget genderOption(
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    bool selected = gender == value;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            gender = value;
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(
+            color: selected ? color.withOpacity(0.12) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: selected ? color : const Color(0xFFE1E3F0),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 28,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight:
+                      selected ? FontWeight.bold : FontWeight.normal,
+                  color: selected ? color : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------- REGISTER ----------------
+
+  void registerStudent() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (gender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select your gender'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please accept Terms & Conditions'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 30,
+              ),
+              SizedBox(width: 10),
+              Text('Success!'),
+            ],
+          ),
+          content: const Text(
+            'Student registration completed successfully.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
